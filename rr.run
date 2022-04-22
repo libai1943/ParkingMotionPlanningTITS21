@@ -1,0 +1,65 @@
+reset;
+model NLP.mod;
+include ig.INIVAL;
+option solver ipopt;
+solve;
+
+shell ("del " & ("ig.INIVAL"));
+for {i in {1..Nfe}} {
+	printf "let x[%d]:= %5.4f; \n", i, x[i]>>("ig.INIVAL");
+	printf "let y[%d]:= %5.4f; \n", i, y[i]>>("ig.INIVAL");
+	printf "let theta[%d]:= %5.4f; \n", i, theta[i]>>("ig.INIVAL");
+	printf "let v[%d]:= %5.4f; \n", i, v[i]>>("ig.INIVAL");
+	printf "let a[%d]:= %5.4f; \n", i, a[i]>>("ig.INIVAL");
+	printf "let phy[%d]:= %5.4f; \n", i, phy[i]>>("ig.INIVAL");		
+	printf "let w[%d]:= %5.4f; \n", i, w[i]>>("ig.INIVAL");
+	printf "let xf[%d]:= %5.4f; \n", i, xf[i]>>("ig.INIVAL");
+	printf "let yf[%d]:= %5.4f; \n", i, yf[i]>>("ig.INIVAL");
+	printf "let xr[%d]:= %5.4f; \n", i, xr[i]>>("ig.INIVAL");
+	printf "let yr[%d]:= %5.4f; \n", i, yr[i]>>("ig.INIVAL");
+}
+printf "let tf:= %5.5f; \n", tf>>("ig.INIVAL");
+close ("ig.INIVAL");
+
+cd AmplResults;
+
+shell ("del " & ("x.txt"));
+shell ("del " & ("y.txt"));
+shell ("del " & ("theta.txt"));
+shell ("del " & ("v.txt"));
+shell ("del " & ("a.txt"));
+shell ("del " & ("phy.txt"));
+shell ("del " & ("w.txt"));
+
+for {i in {1..Nfe}} {
+	printf "%5.4f;", x[i]>>("x.txt");
+	printf "%5.4f;", y[i]>>("y.txt");
+	printf "%5.4f;", theta[i]>>("theta.txt");
+	printf "%5.4f;", v[i]>>("v.txt");
+	printf "%5.4f;", a[i]>>("a.txt");
+	printf "%5.4f;", phy[i]>>("phy.txt");
+	printf "%5.4f;", w[i]>>("w.txt");
+}
+close ("x.txt");
+close ("y.txt");
+close ("theta.txt");
+close ("v.txt");
+close ("a.txt");
+close ("phy.txt");
+
+shell ("del " & ("terminal_time.txt"));
+printf "%5.6f;", tf >> ("terminal_time.txt");
+close ("terminal_time.txt");
+
+shell ("del " & ("infeasibility.txt"));
+printf "%5.10f;", (sum{i in {2..Nfe}}(
+(x[i] - x[i-1] - hi * v[i] * cos(theta[i]))^2 + 
+(y[i] - y[i-1] - hi * v[i] * sin(theta[i]))^2 + 
+(v[i] - v[i-1] - hi * a[i])^2 + 
+(theta[i] - theta[i-1] - hi * tan(phy[i]) * v[i] / L_wheelbase)^2 + 
+(phy[i] - phy[i-1] - hi * w[i])^2 + 
+(xf[i] - x[i] - Lfc * cos(theta[i]))^2 + 
+(yf[i] - y[i] - Lfc * sin(theta[i]))^2 + 
+(xr[i] - x[i] - Lrc * cos(theta[i]))^2 + 
+(yr[i] - y[i] - Lrc * sin(theta[i]))^2))>>("infeasibility.txt");
+close ("infeasibility.txt");

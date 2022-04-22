@@ -1,0 +1,7 @@
+max_iter	500
+max_cpu_time	1
+tol	1e-7
+#bound_push	0.0001
+mu_strategy	adaptive
+linear_solver	ma27
+print_level	5
