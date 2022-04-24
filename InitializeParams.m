@@ -1,6 +1,7 @@
 function InitializeParams()
 global params_
 LoadCase();
+
 params_.utility.colorpool = [237,28,36; 0,162,232; 255,127,39; 218,112,214; 255,192,203; 123,104,238;0,0,255;0,0,139;119,136,153;30,144,255;70,130,180;0,191,255;0,139,139;255,102,0;0,250,154;127,255,0;154,205,50;255,215,0;205,133,63;128,0,0;0,255,255;240,128,128;255,0,0;105,105,105;169,169,169;192,192,192;0,0,0] ./ 255;
 params_.utility.ego_vehicle_rgb = [0.00, 0.45, 0.74];
 params_.utility.traj_dt_for_resample = 0.1;
@@ -27,8 +28,8 @@ params_.vehicle.kappa_max = tan(params_.vehicle.phymax) / params_.vehicle.lw;
 params_.vehicle.turning_radius_min = abs(1.0 / params_.vehicle.kappa_max);
 params_.vehicle.threshold_s = (params_.vehicle.vmax^2) / params_.vehicle.amax; % Is it correct?
 
-params_.hybrid_astar.num_nodes_x = 100;
-params_.hybrid_astar.num_nodes_y = 100;
+params_.hybrid_astar.num_nodes_x = 125;
+params_.hybrid_astar.num_nodes_y = 125;
 params_.hybrid_astar.resolution_dx = (params_.scenario.xmax - params_.scenario.xmin) / params_.hybrid_astar.num_nodes_x;
 params_.hybrid_astar.resolution_dy = (params_.scenario.ymax - params_.scenario.ymin) / params_.hybrid_astar.num_nodes_y;
 params_.hybrid_astar.num_nodes_theta = 30;
@@ -45,8 +46,8 @@ params_.hybrid_astar.threshold_to_trigger_rs = 20;
 
 params_.opti.nfe = 200;
 params_.opti.stc.ds_for_init_adjustment = 0.01;
-params_.opti.stc.ds = 0.02;
-params_.opti.stc.smax = 5.0;
+params_.opti.stc.ds = 0.1;
+params_.opti.stc.smax = 2.0;
 params_.opti.acceptance_tolerance = 0.0001;
 params_.opti.cost_function_external_penalty_weight = 100000;
 params_.opti.cost_a = 0.025;
@@ -56,61 +57,6 @@ params_.opti.max_iter = 5;
 
 CreateCostmaps();
 WriteBasicParameterFile();
-end
-
-function LoadCase()
-global params_
-
-load([pwd, '\ParkingBenchmarks\CaseNo_', num2str(params_.user.case_id), '.mat']);
-params_.task.x0 = x0;
-params_.task.y0 = y0;
-params_.task.theta0 = theta0;
-params_.task.xf = xtf;
-params_.task.yf = ytf;
-params_.task.thetaf = thetatf;
-params_.obstacle.num_obs = length(obstacles);
-params_.obstacle.obs = obstacles;
-WriteBoundaryValues();
-end
-
-function WriteBoundaryValues()
-global params_
-delete('SixBoundaryValues');
-fid = fopen('SixBoundaryValues', 'w');
-fprintf(fid, '1  %f\r\n', params_.task.x0);
-fprintf(fid, '2  %f\r\n', params_.task.y0);
-fprintf(fid, '3  %f\r\n', params_.task.theta0);
-fprintf(fid, '4  %f\r\n', params_.task.xf);
-fprintf(fid, '5  %f\r\n', params_.task.yf);
-fprintf(fid, '6  %f\r\n', params_.task.thetaf);
-fclose(fid);
-end
-
-function WriteBasicParameterFile()
-global params_
-delete('BasicParameters');
-fid = fopen('BasicParameters', 'w');
-fprintf(fid, '1 %g\r\n', params_.scenario.xmin);
-fprintf(fid, '2 %f\r\n', params_.scenario.xmax);
-fprintf(fid, '3 %f\r\n', params_.scenario.ymin);
-fprintf(fid, '4 %f\r\n', params_.scenario.ymax);
-fprintf(fid, '5 %f\r\n', params_.vehicle.lw);
-fprintf(fid, '6 %f\r\n', params_.vehicle.lf);
-fprintf(fid, '7 %f\r\n', params_.vehicle.lr);
-fprintf(fid, '8 %g\r\n', params_.vehicle.lb);
-fprintf(fid, '9 %f\r\n', params_.vehicle.dual_disk_radius);
-fprintf(fid, '10 %f\r\n', params_.vehicle.r2p);
-fprintf(fid, '11 %f\r\n', params_.vehicle.f2p);
-fprintf(fid, '12 %f\r\n', params_.vehicle.vmax);
-fprintf(fid, '13 %f\r\n', params_.vehicle.amax);
-fprintf(fid, '14 %f\r\n', params_.vehicle.phymax);
-fprintf(fid, '15 %f\r\n', params_.vehicle.wmax);
-fprintf(fid, '16 %f\r\n', params_.opti.nfe);
-fprintf(fid, '17 %f\r\n', params_.opti.cost_function_external_penalty_weight);
-fprintf(fid, '18 %f\r\n', params_.opti.cost_a);
-fprintf(fid, '19 %f\r\n', params_.opti.cost_w);
-fprintf(fid, '20 %f\r\n', params_.opti.cost_phy);
-fclose(fid);
 end
 
 function CreateCostmaps()
@@ -153,7 +99,7 @@ for ii = 1 : size(params_.obstacle.obs, 2)
 end
 params_.scenario.original_map = costmap;
 length_unit = 0.5 * (resolution_x + resolution_y);
-basic_elem = strel('disk', ceil(params_.vehicle.dual_disk_radius / length_unit));
+basic_elem = strel('disk', 0 + ceil(params_.vehicle.dual_disk_radius / length_unit));
 params_.scenario.dilated_map = imdilate(costmap, basic_elem);
 end
 

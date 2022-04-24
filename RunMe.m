@@ -9,12 +9,9 @@
 %   trajectory planning for autonomous parking with irregularly placed
 %   obstacles: A lightweight iterative framework,” IEEE Transactions on
 %   Intelligent Transportation Systems, accepted on Aug. 27, 2021.
-%   Some benchmark cases are infeasible, e.g., Case #9, wherein the goal
-%   pose might make the vehicle footprint out of the workspace.
 % ==============================================================================
-%   2022.04.23
+%   2022.04.24
 % ==============================================================================
-
 close all; clc; clear global params_; clear all;
 global params_
 for ii = 1 : 115
@@ -22,6 +19,4 @@ for ii = 1 : 115
     InitializeParams();
     SearchTrajectoryViaFTHA();
     OptimizeTrajectoryViaLIOM();
-    asd();
-    pause(5);
 end
