@@ -1,0 +1,8 @@
+The rigid_search binaries provide the protected hybrid A* initialization component
+through a C ABI. The original project LICENSE also applies to these components.
+No search implementation source is included in this public directory.
+
+Windows x86-64: built with MinGW-w64; tested with CasADi 3.7.2 and IPOPT/MUMPS.
+Linux x86-64: cross-compiled with Zig; execution on Linux has not been verified.
+Compiler runtime components retain their applicable runtime licenses/exceptions.
+CasADi, IPOPT and optional HSL libraries must be installed separately.
