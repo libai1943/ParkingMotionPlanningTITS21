@@ -1,5 +1,7 @@
 # Parking Motion Planning with a Lightweight Iterative Framework
 
+[Download ZIP](https://github.com/libai1943/ParkingMotionPlanningTITS21/archive/refs/heads/main.zip) · [Getting started](#matlab-start-with-one-case) · [Guide](#function-and-file-map) · [Citation](#citation)
+
 **Turn a coarse parking route into an optimized, collision-free maneuver.** This repository accompanies *Optimization-Based Trajectory Planning for Autonomous Parking With Irregularly Placed Obstacles: A Lightweight Iterative Framework*, published in **IEEE Transactions on Intelligent Transportation Systems**, 23(8), 11970–11981, 2022. The DOI and repository name reflect the paper's 2021 online publication.
 
 ![LIOM trajectory, vehicle footprints, and state/control profiles from the included C++ example](docs/liom_example.png)
@@ -83,6 +85,18 @@ The default IPOPT linear solver is **MUMPS**. Optional HSL usage requires a sepa
 The executable writes `trajectory.csv` with columns `t,x,y,theta,v,a,phi,omega`, and `reference.csv` with the initial geometric route. It prints each LIOM iteration's infeasibility and objective. Before reporting success, it verifies the hard bounds and independently checks the actual covering discs against the obstacles at all 200 configuration points.
 
 The C++ penalty objective and discretization follow the repository's `NLP.mod`, including its backward-Euler residuals and terminal-heading sine/cosine penalty. The continuous model and LIOM iteration correspond to the paper; the discrete convention is the one used by this MATLAB release. Search initialization and sparse linear solver can produce different local optima.
+
+### Read the case 1 result
+
+A successful C++ run writes two files to the directory passed to `--output`. Open them side by side to see what the optimization changed.
+
+| File | What to plot | Question it answers |
+| --- | --- | --- |
+| `reference.csv` | `x` against `y` | Where does the geometric initialization pass the obstacles? |
+| `trajectory.csv` | `x` against `y` with equal axes | Which parts of the route moved during corridor refinement? |
+| `trajectory.csv` | `v` and `phi` separately against `t` | Where does the vehicle reverse, and how does it steer through each turn? |
+
+The final console line reports `Tf` in seconds, the number of LIOM iterations, covering-disc clearance in metres and elapsed planning time in seconds. Use `Tf` to compare maneuver duration. Use the elapsed planning time to compare computation on the same hardware. The clearance value comes from the discrete 200-node check in [the C++ validator](cpp/src/main.cpp).
 
 ## Main parameters
 
